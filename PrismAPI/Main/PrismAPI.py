@@ -3,11 +3,13 @@ from requests.auth import HTTPBasicAuth
 
 class PrismAPI():
     '''
-        Leidos Prism API in Python
+        Prism (Jive) API for Python
     '''
 
     MAIN_URL = "https://prism.leidos.com/api/core/v3/"
     PEOPLE = "people/"
+    PEOPLE_SEARCH = "search/people?filter=search(%s)&count=%s&startIndex=%s"
+    PLACE_SEARCH = "search/place?filter=search(%s)&count=%s&startIndex=%s"
     MEMBERS = "members/"
     ANNOUNCEMENTS = "announcements/"
     PLACES = "places/"
@@ -34,40 +36,34 @@ class PrismAPI():
     def escaper(self,data):
         return json.loads(data.content.replace("throw 'allowIllegalResourceCall is false.';",""))
 
+    def make_request(self,url):
+        return self.escaper(requests.get(url,auth=self.auth,verify=False))
 
-    def page_prism(self, count, start_index, action):
+    def page_prism(self, action, count=25, start_index=0):
         url = PrismAPI.MAIN_URL+PrismAPI.PEOPLE+"?sort=firstNameAsc&fields=%s&count=%s&startIndex=%s" % (PrismAPI.actions[action],
                                                                                                          str(count),
                                                                                                          str(start_index))
-        data = requests.get(url,auth=self.auth,verify=False)
-        return self.escaper(data)
+        json_data = self.make_request(url)
+        return [self.get_person(p['id']) for p in json_data['list']]
 
-    def me(self,id):
+    def get_person(self, id):
         url = PrismAPI.MAIN_URL+PrismAPI.PEOPLE+"%s" % id
-        data = requests.get(url,auth=self.auth,verify=False)
-        return self.escaper(data)
+        return self.make_request(url)
 
-    def post_announcement(self,id, subject, text):
-        payload = {
-                "subject":subject,
-                "content":{
-                    "type":"text/html",
-                    "text":text
-                    }
-            }
-        headers = { "Content-Type": "application/json", "Authorization": self.auth }
-        requests.post(PrismAPI.MAIN_URL+PrismAPI.PEOPLE+id+"/"+PrismAPI.ANNOUNCEMENTS, data=json.dumps(payload),headers=headers, verify=False)
+    def search_people(self,query,count=25,start_index=0):
+        url = PrismAPI.MAIN_URL+PrismAPI.PEOPLE_SEARCH % (",".join(query),str(count),str(start_index))
+        #print url
+        return self.make_request(url)
+
+    def next(self,results):
+        url = results['links']['next']
+        return self.make_request(url)
+
+    def previous(self, results):
+        url = results['links']['previous']
+        return self.make_request(url)
+
+    def simple_view(self,results):
+        return [{str(r['jive_label']) : str(r['value']) for r in result['jive']['profile']} for result in results['list']]
 
 
-    def status_update(self, id, subject, text):
-        payload = {
-                "content":{
-                    "type":"text/html",
-                    "text":text
-                    },
-                "subject":subject,
-                "type":"document",
-            }
-        headers = { "Content-Type": "application/json", "Authorization": self.auth }
-        data = requests.post(PrismAPI.MAIN_URL+PrismAPI.PEOPLE+id+PrismAPI.ANNOUNCEMENTS, data=json.dumps(payload),headers=headers, verify=False)
-        print data
