@@ -20,6 +20,7 @@ Most of the generic keys are included in the API.
 <pre>
 from PrismAPI.Main import PrismAPI
 
+prism = PrismAPI.PrismAPI()
 prism.set_basic_auth("username","pword")
 </pre>
 
