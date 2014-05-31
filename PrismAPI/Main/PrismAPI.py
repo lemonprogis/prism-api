@@ -10,10 +10,12 @@ class PrismAPI():
     PEOPLE = "people/"
     PEOPLE_SEARCH = "search/people?filter=search(%s)&count=%s&startIndex=%s"
     PLACE_SEARCH = "search/place?filter=search(%s)&count=%s&startIndex=%s"
+    CONTENT_SEARCH = "search/content?filter=search(%s)&count=%s&startIndex=%s"
     MEMBERS = "members/"
     ANNOUNCEMENTS = "announcements/"
     PLACES = "places/"
-    
+    CONTENT = "content/"
+
     actions = {'following':'@following',
                'reports':'@reports',
                'followers':'@followers',
@@ -39,6 +41,10 @@ class PrismAPI():
     def make_request(self,url):
         return self.escaper(requests.get(url,auth=self.auth,verify=False))
 
+    def post_request(self,url,data):
+        headers = {'Content-Type': 'application/json'}
+        return requests.post(url,auth=self.auth, data=data, headers=headers)
+
     def page_prism(self, action, count=25, start_index=0):
         url = PrismAPI.MAIN_URL+PrismAPI.PEOPLE+"?sort=firstNameAsc&fields=%s&count=%s&startIndex=%s" % (PrismAPI.actions[action],
                                                                                                          str(count),
@@ -48,6 +54,7 @@ class PrismAPI():
 
     def get_person(self, id):
         url = PrismAPI.MAIN_URL+PrismAPI.PEOPLE+"%s" % id
+        print url
         return self.make_request(url)
 
     def search_people(self,query,count=25,start_index=0):
@@ -55,6 +62,10 @@ class PrismAPI():
         #print url
         return self.make_request(url)
 
+    def search_content(self,query,count=25,start_index=0):
+        url = PrismAPI.MAIN_URL+PrismAPI.PEOPLE_CONTENT % (",".join(query),str(count),str(start_index))
+        #print url
+        return self.make_request(url)
     def next(self,results):
         url = results['links']['next']
         return self.make_request(url)
@@ -65,5 +76,6 @@ class PrismAPI():
 
     def simple_view(self,results):
         return [{str(r['jive_label']) : str(r['value']) for r in result['jive']['profile']} for result in results['list']]
+
 
 
