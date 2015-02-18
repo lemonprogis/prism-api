@@ -55,6 +55,15 @@ results = prism.search_people(search,25,0)
 simple_view = prism.simple_view(results)
 </pre>
 
+Posting
+---------
+To post an update to your status:
+
+<pre>
+new_status = 'I am having a good day.'
+prism.status_update(new_status)
+</pre>
+
 Output
 ------
 
