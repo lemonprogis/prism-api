@@ -1,5 +1,6 @@
 from PrismAPI.Main import PrismAPI
 import os
+import time
 
 ################################
 ##  test.py file used for demonstration
@@ -22,3 +23,7 @@ s_results = prism.simple_view(results) # simple view of jive information
 
 for result in s_results:
     print "%s, %s" % (result["Display Name"], result['Title'])
+
+# update your status
+new_status = 'The current date and time is ' + time.strftime("%Y-%m-%d %H:%M")
+prism.status_update(new_status)

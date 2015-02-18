@@ -14,7 +14,7 @@ class PrismAPI():
     MEMBERS = "members/"
     ANNOUNCEMENTS = "announcements/"
     PLACES = "places/"
-    CONTENT = "content/"
+    CONTENTS = "contents/"
 
     actions = {'following':'@following',
                'reports':'@reports',
@@ -44,6 +44,19 @@ class PrismAPI():
     def post_request(self,url,data):
         headers = {'Content-Type': 'application/json'}
         return requests.post(url,auth=self.auth, data=data, headers=headers)
+        
+    def status_update(self,status):
+        url = PrismAPI.MAIN_URL + PrismAPI.CONTENTS
+        headers = {'Content-Type': 'application/json'}
+        data = json.dumps(  
+         { "content": 
+              {  
+               "type": "text/html",  
+               "text": status 
+               },  
+           "type": "update"
+         })  
+        return requests.post(url,auth=self.auth, data=data, headers=headers)    
 
     def page_prism(self, action, count=25, start_index=0):
         url = PrismAPI.MAIN_URL+PrismAPI.PEOPLE+"?sort=firstNameAsc&fields=%s&count=%s&startIndex=%s" % (PrismAPI.actions[action],
