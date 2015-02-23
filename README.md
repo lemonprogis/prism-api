@@ -2,7 +2,8 @@ prism-api
 =========
 
 Built off Jive API for Leidos Prism Social Networking
-Requires requests library 
+
+Requires [requests](http://docs.python-requests.org/en/latest/) library 
 
 Usage
 =====
@@ -18,9 +19,9 @@ Every thing is returned as json objects or lists of json objects for easy naviga
 Most of the generic keys are included in the API.
 
 <pre>
-from PrismAPI.Main import PrismAPI
+from PrismAPI.Classes import PrismAPI
 
-prism = PrismAPI.PrismAPI()
+prism = PrismAPI()
 prism.set_basic_auth("username","pword")
 </pre>
 
