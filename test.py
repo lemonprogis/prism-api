@@ -1,4 +1,4 @@
-from PrismAPI.Main import PrismAPI
+from PrismAPI.Classes import PrismAPI
 import os
 import time
 
